@@ -34,7 +34,7 @@ def scanSub():
     subreddit = r.get_subreddit(redditsub)
     posts = subreddit.get_comments(limit = maxposts)
     for post in posts:
-        pid = post.id
+        pid = post.id 
         try:
             postauthor = post.author.name
             cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
@@ -50,12 +50,12 @@ def scanSub():
                 else:
                     print('No posts or will not reply to self or replied to comment')
                 cur.execute('INSERT INTO oldposts Values(?)', [pid])
-        except praw.errors.APIException, exception:
+        except praw.errors.APIException:
             if exception.error_type in ('TOO_OLD','DELETED_LINK'):
                 cur.execute('INSERT INTO oldposts Values(?)', [pid])
-                print "Can't post comment: archived by reddit"
+                print("Can't post comment: archived by reddit")
         except AttributeError:
-            print "Deleted post lol!"
+            print("Deleted post lol!")
             #Deleted posts lol!
             pass
     sql.commit()
