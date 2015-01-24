@@ -4,32 +4,11 @@ import praw
 import sqlite3
 import re
 
-username = "" #INSERT USERNAME FOR YOUR ACCOUNT HERE
-alternativebot = "" #INSERT USERNAME FOR YOUR SOMEONE YOU DONT WANT TO REPLY TO HERE
-password = "" #INSERT PASSWORD FOR YOUR ACCOUNT HERE
-useragent = "Responds to X banned from Y jokes in /r/nerdcubed. Based on an idea by /u/tokyorockz. Created by /u/alexratman by adapting /u/GoldenSights replybot code"
-redditsub = "nerdcubed"
-find_exp = r'(he|dan|nerd).{1,15}?(banned from)'
-bad_exp = r'many.{1,15}?places'
-subreddit_exp = r'th.{1,3}?sub.{0,8}?'
-reply = "He's banned from many places"
-maxposts = 100
-wait = 20
-
-sql = sqlite3.connect('sql.db')
-print('Loaded SQL Database')
-cur = sql.cursor()
-
-cur.execute('CREATE TABLE IF NOT EXISTS oldposts(ID TEXT)')
-print('Loaded old post table')
-
-sql.commit()
-
-print('Logging in to reddit...')
-r = praw.Reddit(useragent)
-r.login(username, password)
-
 def scanSub():
+	'''
+	Scans given subreddit
+	Posts if post does not exist in db
+	'''
     print('Scanning for jokes on /r/' + redditsub + '.')
     subreddit = r.get_subreddit(redditsub)
     posts = subreddit.get_comments(limit = maxposts)
@@ -43,7 +22,7 @@ def scanSub():
                 match = re.search(find_exp, pbody, re.IGNORECASE)
                 notmatch = re.search(bad_exp, pbody, re.IGNORECASE)
                 subredditbans = re.search(subreddit_exp, pbody, re.IGNORECASE)
-                if match and not notmatch and not subredditbans and postauthor.lower() != username.lower() and postauthor.lower() != alternativebot.lower:
+                if match and not notmatch and not subredditbans and postauthor.lower() != username.lower() and not postauthor.lower() in dontreplytome.lower:
                     print('Found one! Replying to ' + pid + ' by ' + postauthor)
                     post.reply(reply)
                     print('Successfully commented')
@@ -60,6 +39,44 @@ def scanSub():
             pass
     sql.commit()
 
+#USERNAME FOR BOT ACCOUNT HERE
+username = ""
+#INSERT USERNAMES FOR YOUR SOMEONE YOU DONT WANT TO REPLY TO HERE
+dontreplytome = ["Mattophobia"]
+#PASSWORD FOR BOT ACCOUNT HERE
+password = "" 
+#REQUIRED FOR REDDIT NOT TO BAN YOUR SODDING ACCOUNT.
+useragent = "!CHANGE THIS BEFORE RUNNING!"
+#THIS SUBREDDIT THAT THIS IS USED ON
+redditsub = "nerdcubed" 
+#REGEX TO FIND JOKES
+find_exp = r'(he|dan|nerd).{1,15}?(banned from)'
+#IF IT MATCHES THID DON'T REPLY
+bad_exp = r'many.{1,15}?places'
+subreddit_exp = r'th.{1,3}?sub.{0,8}?'
+#WHAT THE BOT REPLIES WITH
+reply = "He's banned from many places"
+#THE MAXIMUM AMOUNT OF POSTS FETCHED AT ONCE
+maxposts = 100
+
+
+#CREATE DB CONNECTION
+sql = sqlite3.connect('sql.db')
+print('Loaded SQL Database')
+cur = sql.cursor()
+
+#SET-UP TABLES
+cur.execute('CREATE TABLE IF NOT EXISTS oldposts(ID TEXT)')
+print('Loaded old post table')
+
+sql.commit()
+
+#LOGIN TO REDDIT
+print('Logging in to reddit...')
+r = praw.Reddit(useragent)
+r.login(username, password)
+
+
 while True:
     try:
         scanSub()
@@ -67,4 +84,3 @@ while True:
         traceback.print_exc()
     print('Running again in %d seconds \n' % wait)
     sql.commit()
-    time.sleep(wait)
