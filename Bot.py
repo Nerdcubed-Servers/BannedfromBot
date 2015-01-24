@@ -4,10 +4,10 @@ import praw
 import sqlite3
 import re
 
-username = "danbanbot"
-alternativebot = "BannedFromPlacesBot"
-password = ""
-useragent = "Responds to X banned from Y jokes in /r/nerdcubed. Based on an idea by /u/tokyorockz. Created by /u/alexratman by adapting /u/GoldenSights replybot code "
+username = "" #INSERT USERNAME FOR YOUR ACCOUNT HERE
+alternativebot = "" #INSERT USERNAME FOR YOUR SOMEONE YOU DONT WANT TO REPLY TO HERE
+password = "" #INSERT PASSWORD FOR YOUR ACCOUNT HERE
+useragent = "Responds to X banned from Y jokes in /r/nerdcubed. Based on an idea by /u/tokyorockz. Created by /u/alexratman by adapting /u/GoldenSights replybot code"
 redditsub = "nerdcubed"
 find_exp = r'(he|dan|nerd).{1,15}?(banned from)'
 bad_exp = r'many.{1,15}?places'
